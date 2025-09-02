@@ -2,6 +2,7 @@
 Tests for core functionality.
 """
 
+import subprocess
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -11,6 +12,7 @@ from nginx_ssl_auto.core import (
     SSLCertificateManager,
     remove_ssl_certificate,
     setup_ssl_certificate,
+    check_ssl_expiry,
 )
 
 
@@ -350,6 +352,70 @@ class TestFunctions:
         mock_manager.remove_ssl_certificate.assert_called_once()
         assert result["mode"] is True
         assert result["message"] == "Success"
+
+    @patch("subprocess.check_output")
+    def test_check_ssl_expiry_success_active(self, mock_check_output):
+        """Test successful SSL expiry check with active certificate."""
+        mock_check_output.return_value = b"notAfter=Dec 31 23:59:59 2024 GMT"
+        
+        result = check_ssl_expiry("example.com")
+        
+        assert result["success"] is True
+        assert result["is_active"] is True
+        mock_check_output.assert_called_once_with(
+            ["openssl", "x509", "-in", "/etc/letsencrypt/live/example.com/fullchain.pem", "-noout", "-enddate"],
+            stderr=subprocess.STDOUT,
+        )
+
+    @patch("subprocess.check_output")
+    def test_check_ssl_expiry_success_expired(self, mock_check_output):
+        """Test successful SSL expiry check with expired certificate."""
+        mock_check_output.return_value = b"notAfter=Jan 01 00:00:00 2020 GMT"
+        
+        result = check_ssl_expiry("example.com")
+        
+        assert result["success"] is True
+        assert result["is_active"] is False
+
+    @patch("subprocess.check_output")
+    def test_check_ssl_expiry_file_not_found(self, mock_check_output):
+        """Test SSL expiry check when certificate file is not found."""
+        mock_check_output.side_effect = FileNotFoundError()
+        
+        result = check_ssl_expiry("example.com")
+        
+        assert result["success"] is False
+        assert "OpenSSL tool is not installed" in result["error"]
+
+    @patch("subprocess.check_output")
+    def test_check_ssl_expiry_certificate_not_found(self, mock_check_output):
+        """Test SSL expiry check when certificate file is not accessible."""
+        mock_check_output.side_effect = subprocess.CalledProcessError(1, "openssl")
+        
+        result = check_ssl_expiry("example.com")
+        
+        assert result["success"] is False
+        assert "Certificate file not found" in result["error"]
+
+    @patch("subprocess.check_output")
+    def test_check_ssl_expiry_parsing_error(self, mock_check_output):
+        """Test SSL expiry check with parsing error."""
+        mock_check_output.return_value = b"invalid_format"
+        
+        result = check_ssl_expiry("example.com")
+        
+        assert result["success"] is False
+        assert "Error parsing the certificate expiration date" in result["error"]
+
+    @patch("subprocess.check_output")
+    def test_check_ssl_expiry_unexpected_error(self, mock_check_output):
+        """Test SSL expiry check with unexpected error."""
+        mock_check_output.side_effect = Exception("Unexpected error")
+        
+        result = check_ssl_expiry("example.com")
+        
+        assert result["success"] is False
+        assert "Unexpected error" in result["error"]
 
 
 if __name__ == "__main__":

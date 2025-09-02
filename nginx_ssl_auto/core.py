@@ -9,6 +9,7 @@ import os
 import re
 import shutil
 import subprocess
+from datetime import datetime
 from typing import Any, Dict
 
 from dotenv import load_dotenv
@@ -396,3 +397,57 @@ def remove_ssl_certificate(domain_name: str) -> Dict[str, Any]:
     # Using a default value of 80
     manager = SSLCertificateManager(domain_name, 80)
     return manager.remove_ssl_certificate()
+
+
+def check_ssl_expiry(domain_name: str) -> Dict[str, Any]:
+    """
+    Check the expiration of an SSL certificate using the OpenSSL command-line tool.
+
+    Args:
+        domain_name (str): The domain name (e.g., example.com)
+
+    Returns:
+        dict: Includes the status of the check and certificate validity
+            - success (bool): True if the check was successful, False if an error occurred
+            - is_active (bool, optional): True if the certificate is still valid, False if it has expired
+            - error (str, optional): Error message in case of failure
+    """
+    cert_path = f"/etc/letsencrypt/live/{domain_name}/fullchain.pem"
+
+    try:
+        # Run openssl command to get the expiration date
+        result = subprocess.check_output(
+            ["openssl", "x509", "-in", cert_path, "-noout", "-enddate"],
+            stderr=subprocess.STDOUT,
+        ).decode("utf-8")
+
+        # Extract the expiration date from the output
+        expiry_date_str = result.split("=")[1].strip()
+        expiry_date = datetime.strptime(expiry_date_str, "%b %d %H:%M:%S %Y GMT")
+
+        # Compare with the current date
+        current_date = datetime.utcnow()
+        is_active = expiry_date >= current_date
+
+        return {"success": True, "is_active": is_active}
+
+    except FileNotFoundError:
+        return {
+            "success": False,
+            "error": "OpenSSL tool is not installed on the system. Please install it.",
+        }
+    except subprocess.CalledProcessError:
+        return {
+            "success": False,
+            "error": f"Certificate file not found or unreadable at {cert_path}",
+        }
+    except ValueError:
+        return {
+            "success": False,
+            "error": "Error parsing the certificate expiration date.",
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": f"Unexpected error: {str(e)}",
+        }

@@ -17,6 +17,7 @@ Automated SSL certificate management for Nginx using Let's Encrypt. This tool si
 - 🔧 **Tool Detection**: Automatic detection and installation of required tools (Nginx, Certbot)
 - 🖥️ **CLI Interface**: Easy-to-use command-line interface
 - 🚀 **Simple Runner**: Easy-to-use `run.py` script for quick setup
+- 🔍 **SSL Certificate Monitoring**: Check SSL certificate expiry status
 
 ## 📋 Prerequisites
 
@@ -81,6 +82,9 @@ python run.py example.com 3000 setup
 # Remove SSL certificate
 python run.py example.com 3000 remove
 
+# Check SSL certificate expiry
+python run.py example.com 3000 check
+
 # Domain is automatically converted to lowercase
 python run.py EXAMPLE.COM 3000 setup  # Converts to example.com
 ```
@@ -99,6 +103,9 @@ nginx-ssl-auto setup example.com 3000 --no-redirect --test-port
 # Remove SSL certificate
 nginx-ssl-auto remove example.com
 
+# Check SSL certificate expiry
+nginx-ssl-auto check example.com
+
 # Show current configuration
 nginx-ssl-auto config
 ```
@@ -106,7 +113,7 @@ nginx-ssl-auto config
 ### Python API
 
 ```python
-from nginx_ssl_auto import setup_ssl_certificate, remove_ssl_certificate
+from nginx_ssl_auto import setup_ssl_certificate, remove_ssl_certificate, check_ssl_expiry
 
 # Set up SSL certificate for a domain
 result = setup_ssl_certificate(
@@ -125,6 +132,16 @@ else:
 result = remove_ssl_certificate("example.com")
 if result["mode"]:
     print(result["message"])
+
+# Check SSL certificate expiry
+result = check_ssl_expiry("example.com")
+if result["success"]:
+    if result["is_active"]:
+        print("SSL certificate is active and valid")
+    else:
+        print("SSL certificate has expired")
+else:
+    print(f"Error: {result['error']}")
 ```
 
 ### Advanced Usage
@@ -148,28 +165,39 @@ result = setup_ssl_certificate(
     ssl_redirect=False,  # Don't redirect HTTP to HTTPS
     test_port=True       # Test port before setup
 )
-```
+
+# Check SSL certificate expiry
+result = check_ssl_expiry("myapp.com")
+if result["success"]:
+    if result["is_active"]:
+        print("✅ SSL certificate is active and valid")
+    else:
+        print("⚠️  SSL certificate has expired")
+else:
+    print(f"❌ Error: {result['error']}")
 
 ## 📁 Project Structure
 
 ```
+
 nginx-ssl-auto/
-├── nginx_ssl_auto/          # Main package
-│   ├── __init__.py          # Package initialization
-│   ├── core.py              # Core functionality
-│   └── cli.py               # Command-line interface
-├── tests/                   # Test suite
-│   ├── __init__.py
-│   ├── test_core.py         # Core functionality tests
-│   └── test_cli.py          # CLI functionality tests
-├── .env.example             # Environment variables template
-├── .gitignore               # Git ignore rules
-├── LICENSE                  # MIT license
-├── README.md                # This file
-├── pyproject.toml           # Project configuration
-├── requirements.txt         # Dependencies
-└── run.py                   # Simple runner script
-```
+├── nginx_ssl_auto/ # Main package
+│ ├── **init**.py # Package initialization
+│ ├── core.py # Core functionality
+│ └── cli.py # Command-line interface
+├── tests/ # Test suite
+│ ├── **init**.py
+│ ├── test_core.py # Core functionality tests
+│ └── test_cli.py # CLI functionality tests
+├── .env.example # Environment variables template
+├── .gitignore # Git ignore rules
+├── LICENSE # MIT license
+├── README.md # This file
+├── pyproject.toml # Project configuration
+├── requirements.txt # Dependencies
+└── run.py # Simple runner script
+
+````
 
 ## 🔧 Configuration Examples
 
@@ -180,7 +208,7 @@ nginx-ssl-auto/
 LETSENCRYPT_EMAIL_DOMAIN=dev
 LETSENCRYPT_WEBROOT=/var/www/dev
 PORT_TEST_TIMEOUT=5
-```
+````
 
 ### Production Environment
 
@@ -233,8 +261,14 @@ pytest tests/test_core.py::TestSSLCertificateManager::test_validate_domain_name_
    ```
 
 4. **Port Not Accessible**: Check if your application is running
+
    ```bash
    netstat -tlnp | grep :3000
+   ```
+
+5. **OpenSSL Not Found**: Install OpenSSL for certificate checking
+   ```bash
+   sudo apt-get install openssl
    ```
 
 ### Debug Mode
@@ -246,8 +280,9 @@ export PYTHONPATH=.
 python3 -c "
 import logging
 logging.basicConfig(level=logging.DEBUG)
-from nginx_ssl_auto import setup_ssl_certificate
+from nginx_ssl_auto import setup_ssl_certificate, check_ssl_expiry
 setup_ssl_certificate('example.com', 3000)
+check_ssl_expiry('example.com')
 "
 ```
 

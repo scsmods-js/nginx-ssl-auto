@@ -4,3 +4,7 @@ python-dotenv>=1.0.0
 # Development dependencies
 pytest>=7.0.0
 pytest-cov>=4.0.0
+
+# System dependencies (not Python packages)
+# - OpenSSL: Required for SSL certificate checking (check_ssl_expiry function)
+#   Install with: sudo apt-get install openssl

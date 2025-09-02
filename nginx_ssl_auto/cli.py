@@ -6,7 +6,12 @@ import argparse
 import sys
 from typing import Optional
 
-from .core import Config, remove_ssl_certificate, setup_ssl_certificate
+from .core import (
+    Config,
+    check_ssl_expiry,
+    remove_ssl_certificate,
+    setup_ssl_certificate,
+)
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -19,6 +24,7 @@ Examples:
   %(prog)s setup example.com 3000
   %(prog)s setup example.com 3000 --no-redirect --test-port
   %(prog)s remove example.com
+  %(prog)s check example.com
   %(prog)s config
         """,
     )
@@ -51,6 +57,10 @@ Examples:
         "remove", help="Remove SSL certificate for a domain"
     )
     remove_parser.add_argument("domain", help="Domain name to remove SSL from")
+
+    # Check command
+    check_parser = subparsers.add_parser("check", help="Check SSL certificate expiry")
+    check_parser.add_argument("domain", help="Domain name to check SSL expiry for")
 
     # Config command
     config_parser = subparsers.add_parser("config", help="Show current configuration")
@@ -113,6 +123,24 @@ def remove_command(args: argparse.Namespace) -> int:
         return 1
 
 
+def check_command(args: argparse.Namespace) -> int:
+    """Handle check command."""
+    print(f"🔍 Checking SSL certificate expiry for {args.domain}")
+    print("-" * 50)
+
+    result = check_ssl_expiry(args.domain)
+
+    if result["success"]:
+        if result["is_active"]:
+            print("✅ SSL certificate is active and valid")
+        else:
+            print("⚠️  SSL certificate has expired")
+        return 0
+    else:
+        print(f"❌ Error: {result['error']}")
+        return 1
+
+
 def main(argv: Optional[list] = None) -> int:
     """
     Main entry point for the CLI.
@@ -138,6 +166,8 @@ def main(argv: Optional[list] = None) -> int:
             return setup_command(args)
         elif args.command == "remove":
             return remove_command(args)
+        elif args.command == "check":
+            return check_command(args)
         elif args.command == "config":
             show_config()
             return 0

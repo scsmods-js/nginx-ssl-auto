@@ -10,6 +10,16 @@ __author__ = "dibbed"
 __telegram__ = "@dibbed"
 __description__ = "Automated SSL certificate management for Nginx using Let's Encrypt"
 
-from .core import Config, remove_ssl_certificate, setup_ssl_certificate
+from .core import (
+    Config,
+    check_ssl_expiry,
+    remove_ssl_certificate,
+    setup_ssl_certificate,
+)
 
-__all__ = ["setup_ssl_certificate", "remove_ssl_certificate", "Config"]
+__all__ = [
+    "setup_ssl_certificate",
+    "remove_ssl_certificate",
+    "check_ssl_expiry",
+    "Config",
+]
